@@ -16,29 +16,15 @@ React · JavaScript · Vite · Tailwind CSS
 npm ci
 ```
 
-### 2. Configure the environment
-
-Create `.env.local` from `.env.example`:
-
-```powershell
-Copy-Item .env.example .env.local
-```
-
-Set the API base URL:
-
-```env
-VITE_API_BASE_URL=https://ts.idicorp.ir
-```
-
-### 3. Run the application
+### 2. Run the application
 
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:5173` or the local URL displayed by Vite.
+The tracked `.env` file supplies the public API base URL, so no `.env.local` setup is needed. Vite uses it for the `/api` proxy and starts the Text Echo relay with the same upstream. Keep passwords, tokens, cookies, and other secrets out of Vite environment variables because `VITE_` values are included in browser code. Open `http://localhost:5173` or the local URL displayed by Vite.
 
-### 4. Build the application
+### 3. Build the application
 
 ```bash
 npm run build
