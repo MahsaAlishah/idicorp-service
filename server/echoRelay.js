@@ -65,7 +65,9 @@ export function createEchoRelay({
   function originFor(request) {
     try {
       const origin = parseOrigin(typeof allowedOrigin === 'function' ? allowedOrigin(request) : allowedOrigin);
-      if (request.headers.origin !== origin.origin || request.headers.host?.toLowerCase() !== origin.host.toLowerCase()) return null;
+      const forwardedHost = String(request.headers['x-forwarded-host'] || '').split(',')[0].trim();
+      const requestHost = forwardedHost || request.headers.host;
+      if (request.headers.origin !== origin.origin || requestHost?.toLowerCase() !== origin.host.toLowerCase()) return null;
       return origin;
     } catch {
       return null;

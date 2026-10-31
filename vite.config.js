@@ -89,6 +89,11 @@ export function createApiProxy(target) {
         });
       },
     },
+    '^/ws/calculator$': {
+      target: apiOrigin.origin,
+      changeOrigin: true,
+      ws: true,
+    },
   };
 }
 

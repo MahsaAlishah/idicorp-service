@@ -6,8 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "start": "node --env-file=.env server/productionServer.js",
     "preview": "vite preview",
     "echo:relay": "node server/runEchoRelay.js"
+  },
+  "engines": {
+    "node": ">=22.13.0"
   },
   "dependencies": {
     "react": "19.3.1",

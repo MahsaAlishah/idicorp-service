@@ -1,4 +1,4 @@
-import { API_UPSTREAM_BASE_URL } from '../../config.js';
+import { API_BASE_URL } from '../../config.js';
 
 const OPERATIONS = new Set(['add', 'subtract', 'multiply', 'divide']);
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
@@ -6,7 +6,7 @@ const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 export function getCalculatorSocketUrl() {
   let base;
   try {
-    base = new URL(API_UPSTREAM_BASE_URL);
+    base = new URL(API_BASE_URL);
   } catch {
     throw new Error('Configure the public API base URL before using the calculator.');
   }
