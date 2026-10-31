@@ -1,62 +1,83 @@
+
 # IDICorp Service Console
 
-A standalone React application built to interact with the IDICorp service API, featuring authentication, task management, WebSocket communication, and streaming capabilities.
+A React-based service console for the IDICorp API, featuring authentication, task management, real-time WebSocket tools, and streaming responses.
+
+**Live demo:** https://idicorp-service.onrender.com  
+**Source code:** https://github.com/MahsaAlishah/idicorp-service  
+**API documentation:** https://ts.idicorp.ir/docs
 
 ## Tech Stack
 
-React · JavaScript · Vite · Tailwind CSS
+- React, JavaScript, Vite, Tailwind CSS
 
-## Getting Started
+## Features
 
-**Requirements:** Node.js 22.13.0 and npm 10.9.2
+- **Authentication:** CAPTCHA-based login, session handling, and logout.
+- **Task management:** Create, view, edit, complete, search, filter, and delete tasks.
+- **Calculator:** Real-time calculations over WebSocket.
+- **Text Echo:** WebSocket messaging through a frontend-owned Node.js relay.
+- **Streaming Echo:** Stream text or file responses, with cancellation support.
+- **Responsive UI:** Dashboard layout with loading, error, and empty states.
 
-### 1. Install dependencies
+## Run Locally
+
+**Requirements:** Node.js 22.13.0 and npm 10.9.2 (or compatible versions).
 
 ```bash
 npm ci
-```
-
-### 2. Run the application
-
-```bash
 npm run dev
 ```
 
-The tracked `.env` file supplies the public API base URL, so no `.env.local` setup is needed. Vite uses it for the `/api` proxy and starts the Text Echo relay with the same upstream. Keep passwords, tokens, cookies, and other secrets out of Vite environment variables because `VITE_` values are included in browser code. Open `http://localhost:5173` or the local URL displayed by Vite.
+Open the local URL printed by Vite (usually `http://localhost:5173`).
 
-### 3. Build the application
+The tracked `.env` provides the public upstream API URL (`VITE_API_BASE_URL=https://ts.idicorp.ir`), so no additional environment file is required for the default setup.
+
+Vite proxies `/api` requests and Calculator WebSocket traffic and starts the Text Echo relay for local development.
+
+To build the production assets:
 
 ```bash
 npm run build
 ```
 
-## Production on Railway
+To run the production Node server locally after building:
 
-The production Node server serves the built React files independently of IDICorp, proxies `/api/*` (including streaming responses), proxies the Calculator WebSocket at `/ws/calculator`, and runs the Text Echo relay at `/__echo/*`. Browser requests stay on the Railway origin. Upstream session cookies are scoped to `/api`, made host-only, and marked `HttpOnly` and `Secure` on public HTTPS requests.
+```bash
+npm start
+```
 
-1. In Railway, create a project with **Deploy from GitHub Repo** and select `MahsaAlishah/idicorp-service` at the repository root.
-2. In the service's **Build** settings, set the Build Command to `npm ci --include=dev && npm run build`. Set the Start Command to `npm start`.
-3. Set the Healthcheck Path to `/healthz`. The service reads Railway's assigned `PORT` and binds to `0.0.0.0`.
-4. Keep `VITE_API_BASE_URL` set to `https://ts.idicorp.ir`. The tracked `.env` provides this public origin; it is also safe to add the same value in Railway's Variables tab. Do not add credentials or tokens to `VITE_` variables.
-5. After deployment is healthy, open **Settings → Networking → Public Networking → Generate Domain**. Railway provides the public HTTPS domain; use that URL for the evaluator.
+The production server reads `PORT` from the environment (and otherwise uses its configured default).
 
-Railway references: [build and start commands](https://docs.railway.com/builds/build-and-start-commands), [health checks](https://docs.railway.com/deployments/healthchecks), [public domains and TLS](https://docs.railway.com/networking/domains/working-with-domains).
+## Live Deployment (Render)
 
-## Features
+The application is deployed as a **Render Web Service**, not a static site. A single Node.js server serves the React build and forwards API and WebSocket traffic to the IDICorp backend.
 
-- **Authentication:** Login with CAPTCHA, session management, and logout.
-- **Task Management:** Create, view, edit, complete, search, filter, and delete tasks.
-- **Calculator:** Real-time arithmetic operations using WebSocket.
-- **Text Echo:** Send and receive messages over a WebSocket connection.
-- **Streaming Echo:** Send text or files and receive streamed responses with cancellation support.
-- **Responsive UI:** Modern dashboard with accessible controls, loading states, and error handling.
+**Live URL:** https://idicorp-service.onrender.com
 
-## API Integration
+To deploy from this repository:
 
-The frontend communicates with the IDICorp service API independently of backend asset hosting.
+1. Create a **Web Service** in Render and connect `MahsaAlishah/idicorp-service`, branch `main`, with the repository root as the root directory.
+2. Choose the **Node** runtime and configure:
 
-During local development, Vite handles API requests through its proxy and starts the frontend-owned Text Echo relay automatically.
+   | Setting | Value |
+   | --- | --- |
+   | Build Command | `npm ci --include=dev && npm run build` |
+   | Start Command | `npm start` |
+   | Health Check Path | `/healthz` |
+   | Environment Variable | `VITE_API_BASE_URL=https://ts.idicorp.ir` |
 
-Calculator uses a same-origin WebSocket proxy. Text Echo uses a Node.js relay to support the service's WebSocket authentication requirements. Streaming Echo is passed through as a stream without buffering the response in the frontend server.
+3. Deploy the service and open the HTTPS URL provided by Render.
 
-**API Documentation:** https://ts.idicorp.ir/docs
+**Free-tier note:** Render's free web services may spin down when idle, so the first request after inactivity can take longer. This is a hosting limitation, not necessarily an application error.
+
+## API and WebSocket Integration
+
+The application uses the IDICorp backend as an API only; the React assets are hosted by the frontend service.
+
+- **HTTP API:** Browser requests use same-origin `/api/*` routes. The Node server proxies them to `https://ts.idicorp.ir`, preserving streamed responses and handling session cookies.
+- **Calculator WebSocket:** The browser connects to same-origin `/ws/calculator`, which is proxied to the upstream Calculator WebSocket.
+- **Text Echo WebSocket:** A frontend-owned Node.js relay handles the upstream authentication header requirement and exposes same-origin `/__echo/*` endpoints.
+- **Streaming Echo:** Responses are forwarded incrementally rather than buffered by the frontend server.
+
+Do not store credentials, bearer tokens, or secrets in `VITE_` environment variables: Vite can embed those values into client-side JavaScript.
