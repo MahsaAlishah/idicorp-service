@@ -4,7 +4,7 @@ A standalone React application built to interact with the IDICorp service API, f
 
 ## Tech Stack
 
-React · JavaScript · Vite · Tailwind CSS · Node.js
+React · JavaScript · Vite · Tailwind CSS
 
 ## Getting Started
 
